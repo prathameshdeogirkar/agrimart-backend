@@ -1,5 +1,6 @@
 package com.agrimart.controller;
 
+import com.agrimart.dto.CheckoutRequest;
 import com.agrimart.entity.Order;
 import com.agrimart.entity.User;
 import com.agrimart.repository.UserRepository;
@@ -17,12 +18,17 @@ public class OrderController {
     private final UserRepository userRepository;
 
     @PostMapping("/checkout")
-    public Order checkout(Authentication authentication) {
+    public Order checkout(
+            Authentication authentication,
+            @RequestBody CheckoutRequest checkoutRequest
+    ) {
 
-        String email = authentication.getName(); // 🔥 FIX
+        String email = authentication.getName();
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return checkoutService.checkout(user);
+        // ✅ FIXED CALL (THIS WAS THE BUG)
+        return checkoutService.checkout(user, checkoutRequest);
     }
 }

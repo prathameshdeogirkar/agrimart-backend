@@ -1,10 +1,14 @@
 package com.agrimart.service;
 
-import com.agrimart.entity.*;
+import com.agrimart.dto.CheckoutRequest;
+import com.agrimart.entity.Cart;
+import com.agrimart.entity.Order;
+import com.agrimart.entity.User;
 import com.agrimart.repository.CartRepository;
 import com.agrimart.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,7 +21,8 @@ public class CheckoutService {
     private final OrderRepository orderRepository;
     private final CartService cartService;
 
-    public Order checkout(User user) {
+    @Transactional
+    public Order checkout(User user, CheckoutRequest request) {
 
         List<Cart> cartItems = cartRepository.findByUser(user);
 
@@ -25,20 +30,22 @@ public class CheckoutService {
             throw new RuntimeException("Cart is empty");
         }
 
-        double total = 0;
-        for (Cart cart : cartItems) {
-            total += cart.getProduct().getPrice() * cart.getQuantity();
-        }
+        double total = cartItems.stream()
+                .mapToDouble(c -> c.getProduct().getPrice() * c.getQuantity())
+                .sum();
 
         Order order = Order.builder()
                 .user(user)
                 .totalAmount(total)
                 .status("PLACED")
-                .orderDate(LocalDateTime.now()) // ✅ FIXED
+                .orderDate(LocalDateTime.now())
+                .address(request.getAddress())
+                .paymentMode(request.getPaymentMode())
                 .build();
 
         Order savedOrder = orderRepository.save(order);
 
+        // 🧹 Clear cart only after order is saved
         cartService.clearCart(user);
 
         return savedOrder;
