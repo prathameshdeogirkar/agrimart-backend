@@ -20,15 +20,13 @@ public class OrderController {
     @PostMapping("/checkout")
     public Order checkout(
             Authentication authentication,
-            @RequestBody CheckoutRequest checkoutRequest
+            @RequestBody CheckoutRequest request
     ) {
-
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // ✅ FIXED CALL (THIS WAS THE BUG)
-        return checkoutService.checkout(user, checkoutRequest);
+        return checkoutService.checkout(user, request);
     }
 }

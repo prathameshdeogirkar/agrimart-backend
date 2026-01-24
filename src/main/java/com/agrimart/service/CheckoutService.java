@@ -39,13 +39,20 @@ public class CheckoutService {
                 .totalAmount(total)
                 .status("PLACED")
                 .orderDate(LocalDateTime.now())
+
+                // ✅ CHECKOUT DETAILS
+                .fullName(request.getFullName())
+                .mobile(request.getMobile())
                 .address(request.getAddress())
+                .city(request.getCity())
+                .pincode(request.getPincode())
                 .paymentMode(request.getPaymentMode())
+
                 .build();
 
         Order savedOrder = orderRepository.save(order);
 
-        // 🧹 Clear cart only after order is saved
+        // 🧹 clear cart after order
         cartService.clearCart(user);
 
         return savedOrder;
