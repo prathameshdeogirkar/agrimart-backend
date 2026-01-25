@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    List<Order> findByUser(User user);
+    // ✅ Order history for user (latest first)
+    List<Order> findByUserOrderByOrderDateDesc(User user);
 }

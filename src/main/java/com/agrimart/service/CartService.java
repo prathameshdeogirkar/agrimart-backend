@@ -1,5 +1,6 @@
 package com.agrimart.service;
 
+import com.agrimart.dto.CartResponse;
 import com.agrimart.entity.Cart;
 import com.agrimart.entity.Product;
 import com.agrimart.entity.User;
@@ -10,55 +11,73 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional   // ✅ IMPORTANT: applies to ALL methods
+@Transactional
 public class CartService {
 
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
 
     // ✅ ADD TO CART
-    public Cart addToCart(User user, Long productId, int qty) {
+    public Cart addToCart(User user, Long productId, int quantity) {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        Cart cart = cartRepository
-                .findByUserAndProduct(user, product)
-                .orElse(
-                        Cart.builder()
-                                .user(user)
-                                .product(product)
-                                .quantity(0)
-                                .build()
-                );
+        Optional<Cart> existingCart =
+                cartRepository.findByUserAndProduct(user, product);
 
-        cart.setQuantity(cart.getQuantity() + qty);
+        // ✅ If product already in cart → increase quantity
+        if (existingCart.isPresent()) {
+            Cart cart = existingCart.get();
+            cart.setQuantity(cart.getQuantity() + quantity);
+            return cartRepository.save(cart);
+        }
+
+        // ✅ Else create new cart entry
+        Cart cart = new Cart();
+        cart.setUser(user);
+        cart.setProduct(product);
+        cart.setQuantity(quantity);
+
         return cartRepository.save(cart);
     }
 
-    // ✅ VIEW CART
-    @Transactional(readOnly = true)
-    public List<Cart> viewCart(User user) {
-        return cartRepository.findByUser(user);
-    }
+    // ✅ VIEW CART (DTO – SAFE RESPONSE)
+public List<CartResponse> viewCart(User user) {
 
-    // ✅ REMOVE SINGLE ITEM FROM CART
-    public void removeFromCart(User user, Long productId) {
+    return cartRepository.findByUser(user)
+            .stream()
+            .map(cart -> new CartResponse(
+                    cart.getId(),
+                    cart.getProduct().getId(),
+                    cart.getProduct().getName(),
+                    cart.getProduct().getPrice(),
+                    cart.getQuantity(),
+                    cart.getProduct().getPrice() * cart.getQuantity()
+            ))
+            .toList();
+}
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+    // ✅ REMOVE FROM CART
+    public void removeFromCart(User user, Long cartId) {
 
-        Cart cart = cartRepository.findByUserAndProduct(user, product)
-                .orElseThrow(() -> new RuntimeException("Item not found in cart"));
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+
+        if (!cart.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
 
         cartRepository.delete(cart);
     }
 
-    // ✅ CLEAR CART (USED IN CHECKOUT)
+    // ✅ CLEAR CART (used after checkout)
     public void clearCart(User user) {
-        cartRepository.deleteByUser(user);
+        List<Cart> cartItems = cartRepository.findByUser(user);
+        cartRepository.deleteAll(cartItems);
     }
 }

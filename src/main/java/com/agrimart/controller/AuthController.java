@@ -4,7 +4,8 @@ import com.agrimart.dto.LoginRequest;
 import com.agrimart.dto.RegisterRequest;
 import com.agrimart.entity.User;
 import com.agrimart.service.AuthService;
-import com.agrimart.config.JwtUtil;
+import com.agrimart.util.JwtUtil;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
