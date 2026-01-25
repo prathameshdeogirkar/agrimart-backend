@@ -2,14 +2,16 @@ package com.agrimart.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @Builder
 public class OrderResponse {
 
-    private Long id;
+    private Long orderId;
     private double totalAmount;
     private String status;
     private LocalDateTime orderDate;

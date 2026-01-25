@@ -31,14 +31,31 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                // ✅ PUBLIC ENDPOINTS
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/api/products/**").permitAll()
 
+    // ✅ PUBLIC
+    .requestMatchers("/auth/**").permitAll()
+    .requestMatchers("/api/products", "/api/products/**").permitAll()
 
-                // 🔐 PROTECTED ENDPOINTS
-                .anyRequest().authenticated()
-            )
+    // 🧑 USER
+    .requestMatchers(
+        "/api/cart/**",
+        "/api/orders/my/**",
+        "/api/checkout/**"
+    ).hasRole("USER")
+
+    // 👑 ADMIN
+    .requestMatchers(
+        "/api/admin/**",
+        "/api/products/add",
+        "/api/products/update/**",
+        "/api/products/delete/**",
+        "/api/orders/**"
+    ).hasRole("ADMIN")
+
+    // 🔐 EVERYTHING ELSE
+    .anyRequest().authenticated()
+)
+
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

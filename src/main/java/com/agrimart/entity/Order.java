@@ -5,12 +5,12 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "orders")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "orders")
 public class Order {
 
     @Id
@@ -18,16 +18,12 @@ public class Order {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
     private double totalAmount;
-
     private String status;
-
     private LocalDateTime orderDate;
 
-    // ✅ ADD THESE
     private String fullName;
     private String mobile;
     private String address;

@@ -15,17 +15,19 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
+    // ✅ ORDER HISTORY
     public List<OrderResponse> getOrdersForUser(User user) {
 
         return orderRepository.findByUserOrderByOrderDateDesc(user)
                 .stream()
-                .map(this::mapToResponse)
+                .map(this::convertToResponse) // ✅ FIXED HERE
                 .toList();
     }
 
-    private OrderResponse mapToResponse(Order order) {
+    // ✅ ENTITY → DTO
+    public OrderResponse convertToResponse(Order order) {
         return OrderResponse.builder()
-                .id(order.getId())
+                .orderId(order.getId())
                 .totalAmount(order.getTotalAmount())
                 .status(order.getStatus())
                 .orderDate(order.getOrderDate())

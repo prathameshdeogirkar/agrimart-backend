@@ -1,10 +1,14 @@
 package com.agrimart.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CheckoutRequest {
 
     private String fullName;
@@ -12,5 +16,5 @@ public class CheckoutRequest {
     private String address;
     private String city;
     private String pincode;
-    private String paymentMode; // COD / UPI / CARD
+    private String paymentMode;
 }

@@ -24,17 +24,20 @@ public class OrderController {
     private final UserRepository userRepository;
 
     // ✅ CHECKOUT
-    @PostMapping("/checkout")
-    public Order checkout(
-            Authentication authentication,
-            @RequestBody CheckoutRequest request
-    ) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+@PostMapping("/checkout")
+public OrderResponse checkout(
+        Authentication authentication,
+        @RequestBody CheckoutRequest request
+) {
+    String email = authentication.getName();
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return checkoutService.checkout(user, request);
-    }
+    Order order = checkoutService.checkout(user, request);
+
+    return orderService.convertToResponse(order);
+}
+
 
     // ✅ ORDER HISTORY
    @GetMapping

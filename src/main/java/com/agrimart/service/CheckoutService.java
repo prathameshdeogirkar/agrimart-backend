@@ -3,8 +3,10 @@ package com.agrimart.service;
 import com.agrimart.dto.CheckoutRequest;
 import com.agrimart.entity.Cart;
 import com.agrimart.entity.Order;
+import com.agrimart.entity.OrderItem;
 import com.agrimart.entity.User;
 import com.agrimart.repository.CartRepository;
+import com.agrimart.repository.OrderItemRepository;
 import com.agrimart.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ public class CheckoutService {
 
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
     private final CartService cartService;
 
     @Transactional
@@ -40,7 +43,7 @@ public class CheckoutService {
                 .status("PLACED")
                 .orderDate(LocalDateTime.now())
 
-                // ✅ CHECKOUT DETAILS
+                // Checkout details
                 .fullName(request.getFullName())
                 .mobile(request.getMobile())
                 .address(request.getAddress())
@@ -50,9 +53,22 @@ public class CheckoutService {
 
                 .build();
 
+        // ✅ Save order
         Order savedOrder = orderRepository.save(order);
 
-        // 🧹 clear cart after order
+        // ✅ SAVE ORDER ITEMS
+        for (Cart cart : cartItems) {
+            OrderItem item = OrderItem.builder()
+                    .order(savedOrder)
+                    .product(cart.getProduct())
+                    .quantity(cart.getQuantity())
+                    .price(cart.getProduct().getPrice())
+                    .build();
+
+            orderItemRepository.save(item);
+        }
+
+        // 🧹 Clear cart AFTER saving items
         cartService.clearCart(user);
 
         return savedOrder;
