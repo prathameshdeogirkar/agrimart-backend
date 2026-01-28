@@ -57,8 +57,13 @@
     </dependency>
 
     <!-- Lombok -->
-    <dependency>
-        <groupId>org.projectlombok</groupId>
+    		<dependency>
+			<groupId>com.razorpay</groupId>
+			<artifactId>razorpay-java</artifactId>
+			<version>1.4.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <version>1.18.34</version>
         <optional>true</optional>
@@ -91,7 +96,23 @@
         <artifactId>spring-boot-starter-test</artifactId>
         <scope>test</scope>
     </dependency>
+
+
+    <!-- PDF Generation -->
+    <dependency>
+        <groupId>com.github.librepdf</groupId>
+        <artifactId>openpdf</artifactId>
+        <version>1.3.30</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-mail</artifactId>
+    </dependency>
 </dependencies>
+
+
+
 
 
 	<build>

@@ -10,4 +10,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // ✅ Order history for user (latest first)
     List<Order> findByUserOrderByOrderDateDesc(User user);
+
+    // ✅ Admin: Get all orders (latest first)
+    List<Order> findAllByOrderByOrderDateDesc();
 }

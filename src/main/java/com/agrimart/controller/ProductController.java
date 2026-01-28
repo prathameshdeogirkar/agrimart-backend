@@ -16,26 +16,46 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // 🔐 ADMIN ONLY
+    // ✅ PUBLIC - View all products (Paginated)
+    @GetMapping
+    public org.springframework.data.domain.Page<Product> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        return productService.getAll(pageable);
+    }
+
+    // ✅ PUBLIC - View product by ID
+    @GetMapping("/{id}")
+    public Product getById(@PathVariable Long id) {
+        return productService.getById(id);
+    }
+
+    // ✅ PUBLIC - Get products by category
+    @GetMapping("/category/{category}")
+    public List<Product> getByCategory(@PathVariable String category) {
+        return productService.getByCategory(category);
+    }
+
+    // 🔐 ADMIN ONLY - Create product
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public Product create(@RequestBody Product product) {
         return productService.create(product);
     }
 
-    // 🌍 PUBLIC
-    @GetMapping
-    public List<Product> getAll() {
-        return productService.getAll();
+    // 🔐 ADMIN ONLY - Update product
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public Product update(@PathVariable Long id, @RequestBody Product product) {
+        return productService.update(id, product);
     }
 
-    @GetMapping("/{id}")
-    public Product getById(@PathVariable Long id) {
-        return productService.getById(id);
+    // 🔐 ADMIN ONLY - Delete product
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        productService.delete(id);
     }
 
-    @GetMapping("/category/{category}")
-    public List<Product> getByCategory(@PathVariable String category) {
-        return productService.getByCategory(category);
-    }
 }

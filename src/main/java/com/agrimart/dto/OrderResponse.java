@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class OrderResponse {
 
     private Long orderId;
+    private String publicOrderId;
     private double totalAmount;
     private String status;
     private LocalDateTime orderDate;
@@ -22,4 +23,6 @@ public class OrderResponse {
     private String city;
     private String pincode;
     private String paymentMode;
+
+    private java.util.List<OrderItemDto> items;
 }

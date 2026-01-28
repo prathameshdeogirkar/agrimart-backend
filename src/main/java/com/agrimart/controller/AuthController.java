@@ -45,7 +45,8 @@ public class AuthController {
                 request.getPassword()
         );
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        // ✅ FIXED: Pass role to JWT generator
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
 
         return ResponseEntity.ok(Map.of("token", token));
     }

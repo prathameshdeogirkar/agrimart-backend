@@ -17,6 +17,9 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // User-facing Order ID (e.g., AGM-2026-123456)
+    private String publicOrderId;
+
     @ManyToOne
     private User user;
 
@@ -30,4 +33,10 @@ public class Order {
     private String city;
     private String pincode;
     private String paymentMode;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private java.util.List<OrderItem> orderItems;
+
+    private String razorpayOrderId;
+    private String razorpayPaymentId;
 }

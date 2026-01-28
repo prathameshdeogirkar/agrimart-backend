@@ -75,6 +75,41 @@ public List<CartResponse> viewCart(User user) {
         cartRepository.delete(cart);
     }
 
+    // ✅ UPDATE CART ITEM QUANTITY
+    // - Ownership check: User can only update their own cart items
+    // - Validation: Quantity must be >= 1
+    // - Returns updated CartResponse with new total price
+    public CartResponse updateCartQuantity(User user, Long cartId, int quantity) {
+        
+        // Find cart item
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+
+        // Ownership check: Ensure user owns this cart item
+        if (!cart.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized: Cannot modify other user's cart");
+        }
+
+        // Validation: Quantity must be at least 1
+        if (quantity < 1) {
+            throw new RuntimeException("Quantity must be at least 1");
+        }
+
+        // Update quantity and save
+        cart.setQuantity(quantity);
+        cart = cartRepository.save(cart);
+
+        // Return updated item as CartResponse
+        return new CartResponse(
+                cart.getId(),
+                cart.getProduct().getId(),
+                cart.getProduct().getName(),
+                cart.getProduct().getPrice(),
+                cart.getQuantity(),
+                cart.getProduct().getPrice() * cart.getQuantity()
+        );
+    }
+
     // ✅ CLEAR CART (used after checkout)
     public void clearCart(User user) {
         List<Cart> cartItems = cartRepository.findByUser(user);

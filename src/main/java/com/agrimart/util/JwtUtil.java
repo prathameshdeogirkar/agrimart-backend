@@ -15,9 +15,11 @@ public class JwtUtil {
     private static final SecretKey SECRET_KEY =
             Keys.hmacShaKeyFor("agrimart-secret-key-agrimart-secret-key".getBytes());
 
-    public String generateToken(String email) {
+    // ✅ FIXED: Now accepts role as parameter to include in JWT
+    public String generateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("role", role)  // ✅ CRITICAL: Include role in JWT
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 1 day
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS256)

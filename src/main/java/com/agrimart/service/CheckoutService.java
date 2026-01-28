@@ -19,58 +19,72 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CheckoutService {
 
-    private final CartRepository cartRepository;
-    private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
-    private final CartService cartService;
+        private final CartRepository cartRepository;
+        private final OrderRepository orderRepository;
+        private final OrderItemRepository orderItemRepository;
+        private final CartService cartService;
+        private final EmailService emailService;
 
-    @Transactional
-    public Order checkout(User user, CheckoutRequest request) {
+        @Transactional
+        public Order checkout(User user, CheckoutRequest request) {
 
-        List<Cart> cartItems = cartRepository.findByUser(user);
+                List<Cart> cartItems = cartRepository.findByUser(user);
 
-        if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+                if (cartItems.isEmpty()) {
+                        throw new RuntimeException("Cart is empty");
+                }
+
+                double total = cartItems.stream()
+                                .mapToDouble(c -> c.getProduct().getPrice() * c.getQuantity())
+                                .sum();
+
+                // Generate ID: AGM-{YEAR}-{RANDOM_6_DIGITS}
+                String year = String.valueOf(LocalDateTime.now().getYear());
+                String random = String.format("%06d", new java.util.Random().nextInt(1000000));
+                String publicId = "AGM-" + year + "-" + random;
+
+                Order order = Order.builder()
+                                .user(user)
+                                .publicOrderId(publicId)
+                                .totalAmount(total)
+                                .status("PLACED")
+                                .orderDate(LocalDateTime.now())
+
+                                // Checkout details
+                                .fullName(request.getFullName())
+                                .mobile(request.getMobile())
+                                .address(request.getAddress())
+                                .city(request.getCity())
+                                .pincode(request.getPincode())
+                                .paymentMode(request.getPaymentMode())
+
+                                .build();
+
+                // ✅ Save order
+                Order savedOrder = orderRepository.save(order);
+
+                // ✅ SAVE ORDER ITEMS
+                // ✅ SAVE ORDER ITEMS
+                List<OrderItem> savedItems = new java.util.ArrayList<>();
+                for (Cart cart : cartItems) {
+                        OrderItem item = OrderItem.builder()
+                                        .order(savedOrder)
+                                        .product(cart.getProduct())
+                                        .quantity(cart.getQuantity())
+                                        .price(cart.getProduct().getPrice())
+                                        .build();
+
+                        savedItems.add(orderItemRepository.save(item));
+                }
+
+                // 🔄 Attach items to order object (for Email/Invoice generation)
+                savedOrder.setOrderItems(savedItems);
+                // 🧹 Clear cart AFTER saving items
+                cartService.clearCart(user);
+
+                // 📧 Send Invoice Email (Async)
+                emailService.sendOrderConfirmation(savedOrder);
+
+                return savedOrder;
         }
-
-        double total = cartItems.stream()
-                .mapToDouble(c -> c.getProduct().getPrice() * c.getQuantity())
-                .sum();
-
-        Order order = Order.builder()
-                .user(user)
-                .totalAmount(total)
-                .status("PLACED")
-                .orderDate(LocalDateTime.now())
-
-                // Checkout details
-                .fullName(request.getFullName())
-                .mobile(request.getMobile())
-                .address(request.getAddress())
-                .city(request.getCity())
-                .pincode(request.getPincode())
-                .paymentMode(request.getPaymentMode())
-
-                .build();
-
-        // ✅ Save order
-        Order savedOrder = orderRepository.save(order);
-
-        // ✅ SAVE ORDER ITEMS
-        for (Cart cart : cartItems) {
-            OrderItem item = OrderItem.builder()
-                    .order(savedOrder)
-                    .product(cart.getProduct())
-                    .quantity(cart.getQuantity())
-                    .price(cart.getProduct().getPrice())
-                    .build();
-
-            orderItemRepository.save(item);
-        }
-
-        // 🧹 Clear cart AFTER saving items
-        cartService.clearCart(user);
-
-        return savedOrder;
-    }
 }
