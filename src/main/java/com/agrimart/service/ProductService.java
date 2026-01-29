@@ -66,6 +66,8 @@ public class ProductService {
         if (productDetails.getGalleryImages() != null) {
             product.setGalleryImages(productDetails.getGalleryImages());
         }
+        // Support toggling active status
+        product.setActive(productDetails.isActive());
 
         return productRepository.save(product);
     }
@@ -73,18 +75,17 @@ public class ProductService {
     public void delete(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-        productRepository.deleteById(id);
+        // Soft Delete: Set active to false instead of deleting row
+        product.setActive(false);
+        productRepository.save(product);
     }
 
     public List<Product> getAll() {
         return productRepository.findAll();
     }
 
-    public org.springframework.data.domain.Page<Product> getAll(org.springframework.data.domain.Pageable pageable) {
-        return productRepository.findAll(pageable);
-    }
-
-    public org.springframework.data.domain.Page<Product> getAll(String search,
+    // Admin view: All products (Active + Disabled)
+    public org.springframework.data.domain.Page<Product> getAllAdmin(String search,
             org.springframework.data.domain.Pageable pageable) {
         if (search != null && !search.trim().isEmpty()) {
             return productRepository.findByNameContainingIgnoreCase(search.trim(), pageable);
@@ -92,8 +93,17 @@ public class ProductService {
         return productRepository.findAll(pageable);
     }
 
+    // Public view: Only active products
+    public org.springframework.data.domain.Page<Product> getAllActive(String search,
+            org.springframework.data.domain.Pageable pageable) {
+        if (search != null && !search.trim().isEmpty()) {
+            return productRepository.findByNameContainingIgnoreCaseAndActiveTrue(search.trim(), pageable);
+        }
+        return productRepository.findByActiveTrue(pageable);
+    }
+
     public List<Product> getByCategory(String category) {
-        return productRepository.findByCategory(category);
+        return productRepository.findByCategoryAndActiveTrue(category);
     }
 
     public Product getById(Long id) {

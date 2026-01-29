@@ -16,7 +16,6 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // ✅ PUBLIC - View all products (Paginated + Search + Sort)
     @GetMapping
     public org.springframework.data.domain.Page<Product> getAll(
             @RequestParam(defaultValue = "0") int page,
@@ -24,6 +23,24 @@ public class ProductController {
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "id,desc") String[] sort) {
 
+        org.springframework.data.domain.Pageable pageable = createPageable(page, size, sort);
+        return productService.getAllActive(search, pageable);
+    }
+
+    // 🔐 ADMIN ONLY - View all products (including disabled)
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin")
+    public org.springframework.data.domain.Page<Product> getAllAdmin(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "id,desc") String[] sort) {
+
+        org.springframework.data.domain.Pageable pageable = createPageable(page, size, sort);
+        return productService.getAllAdmin(search, pageable);
+    }
+
+    private org.springframework.data.domain.Pageable createPageable(int page, int size, String[] sort) {
         String sortField = sort[0];
         String sortDirection = (sort.length > 1) ? sort[1] : "desc";
 
@@ -31,10 +48,7 @@ public class ProductController {
                 ? org.springframework.data.domain.Sort.by(sortField).ascending()
                 : org.springframework.data.domain.Sort.by(sortField).descending();
 
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size,
-                sorting);
-
-        return productService.getAll(search, pageable);
+        return org.springframework.data.domain.PageRequest.of(page, size, sorting);
     }
 
     // ✅ PUBLIC - View product by ID

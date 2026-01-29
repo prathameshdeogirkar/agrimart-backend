@@ -7,7 +7,13 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-        List<Product> findByCategory(String category);
+        List<Product> findByCategoryAndActiveTrue(String category);
+
+        org.springframework.data.domain.Page<Product> findByActiveTrue(
+                        org.springframework.data.domain.Pageable pageable);
+
+        org.springframework.data.domain.Page<Product> findByNameContainingIgnoreCaseAndActiveTrue(String name,
+                        org.springframework.data.domain.Pageable pageable);
 
         org.springframework.data.domain.Page<Product> findByNameContainingIgnoreCase(String name,
                         org.springframework.data.domain.Pageable pageable);

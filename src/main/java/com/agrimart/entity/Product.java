@@ -42,4 +42,7 @@ public class Product {
     @Column(name = "image_url")
     @Builder.Default
     private java.util.List<String> galleryImages = new java.util.ArrayList<>();
+
+    @Builder.Default
+    private boolean active = true;
 }
