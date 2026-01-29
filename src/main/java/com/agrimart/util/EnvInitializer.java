@@ -15,9 +15,13 @@ public class EnvInitializer {
     private static final String EXAMPLE_FILE = ".env.example";
 
     public static void init() {
-        // 🚆 Detect Railway environment
-        if (System.getenv("RAILWAY_ENVIRONMENT") != null) {
-            System.out.println("🚆 Railway environment detected. Skipping .env initialization.");
+
+        // ☁️ Detect Railway / cloud environment
+        if (System.getenv("RAILWAY_ENVIRONMENT") != null
+                || System.getenv("RAILWAY_PROJECT_ID") != null
+                || System.getenv("PORT") != null) {
+
+            System.out.println("☁️ Cloud environment detected — skipping .env initialization");
             return;
         }
 
