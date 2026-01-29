@@ -14,30 +14,41 @@ public class EnvInitializer {
     private static final String ENV_FILE = ".env";
     private static final String EXAMPLE_FILE = ".env.example";
 
-    public static void init() {
-        System.out.println("🚀 Initializing Environment Configuration...");
+public static void init() {
 
-        Path envPath = Paths.get(ENV_FILE);
-        Path examplePath = Paths.get(EXAMPLE_FILE);
+    // ✅ Detect Production / Railway
+    String railwayEnv = System.getenv("RAILWAY_ENVIRONMENT");
+    String springProfile = System.getenv("SPRING_PROFILES_ACTIVE");
 
-        // 1. Auto-create .env if missing
-        if (!Files.exists(envPath)) {
-            System.out.println("⚠️  .env file missing. Creating from .env.example...");
-            if (!Files.exists(examplePath)) {
-                throw new RuntimeException(
-                        "CRITICAL ERROR: .env.example missing! Please ensure it exists in the root directory.");
-            }
-            try {
-                Files.copy(examplePath, envPath, StandardCopyOption.COPY_ATTRIBUTES);
-                System.out.println("✅ .env file created successfully.");
-            } catch (IOException e) {
-                throw new RuntimeException("CRITICAL ERROR: Failed to copy .env.example to .env", e);
-            }
-        }
-
-        // 2. Fail-fast validation
-        validateEnv();
+    if (railwayEnv != null || "production".equalsIgnoreCase(springProfile)) {
+        System.out.println("🚀 Production environment detected. Skipping EnvInitializer.");
+        return;
     }
+
+    System.out.println("🚀 Initializing LOCAL Environment Configuration...");
+
+    Path envPath = Paths.get(ENV_FILE);
+    Path examplePath = Paths.get(EXAMPLE_FILE);
+
+    // 1. Auto-create .env if missing (LOCAL ONLY)
+    if (!Files.exists(envPath)) {
+        System.out.println("⚠️  .env file missing. Creating from .env.example...");
+        if (!Files.exists(examplePath)) {
+            throw new RuntimeException(
+                    "CRITICAL ERROR: .env.example missing! Please ensure it exists in the root directory.");
+        }
+        try {
+            Files.copy(examplePath, envPath, StandardCopyOption.COPY_ATTRIBUTES);
+            System.out.println("✅ .env file created successfully.");
+        } catch (IOException e) {
+            throw new RuntimeException("CRITICAL ERROR: Failed to copy .env.example to .env", e);
+        }
+    }
+
+    // 2. Fail-fast validation (LOCAL ONLY)
+    validateEnv();
+}
+
 
     private static void validateEnv() {
         try {
