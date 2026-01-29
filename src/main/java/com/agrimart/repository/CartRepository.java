@@ -2,7 +2,7 @@ package com.agrimart.repository;
 
 import com.agrimart.entity.Cart;
 import com.agrimart.entity.User;
-import com.agrimart.entity.Product;   // ✅ ADD THIS
+import com.agrimart.entity.Product; // ✅ ADD THIS
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -51,6 +51,14 @@ public class ProductService {
         return productRepository.findAll(pageable);
     }
 
+    public org.springframework.data.domain.Page<Product> getAll(String search,
+            org.springframework.data.domain.Pageable pageable) {
+        if (search != null && !search.trim().isEmpty()) {
+            return productRepository.findByNameContainingIgnoreCase(search.trim(), pageable);
+        }
+        return productRepository.findAll(pageable);
+    }
+
     public List<Product> getByCategory(String category) {
         return productRepository.findByCategory(category);
     }

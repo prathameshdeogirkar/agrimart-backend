@@ -21,68 +21,76 @@ import java.util.List;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    private final JwtAuthFilter jwtAuthFilter;
+        private final JwtAuthFilter jwtAuthFilter;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> {}) // ✅ enable CORS
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .authorizeHttpRequests(auth -> auth
+                http
+                                .csrf(csrf -> csrf.disable())
+                                .cors(cors -> {
+                                }) // ✅ enable CORS
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(auth -> auth
 
-    // ✅ PUBLIC
-    .requestMatchers("/auth/**").permitAll()
-    .requestMatchers("/api/products", "/api/products/**").permitAll()
+                                                // ✅ PUBLIC
+                                                .requestMatchers("/auth/**").permitAll()
+                                                .requestMatchers("/api/products/**").permitAll()
 
-    // 🧑 USER
-    .requestMatchers(
-        "/api/cart/**",
-        "/api/orders/my/**",
-        "/api/checkout/**"
-    ).hasRole("USER")
+                                                // 🔐 SECURED (Roles handled by @PreAuthorize in Controllers)
+                                                .requestMatchers(
+                                                                "/api/cart/**",
+                                                                "/api/orders/**",
+                                                                "/api/checkout/**",
+                                                                "/api/admin/**")
+                                                .authenticated()
 
-    // 👑 ADMIN
-    .requestMatchers(
-        "/api/admin/**",
-        "/api/products/add",
-        "/api/products/update/**",
-        "/api/products/delete/**",
-        "/api/orders/**"
-    ).hasRole("ADMIN")
+                                                // 🔐 EVERYTHING ELSE
+                                                .anyRequest().authenticated())
 
-    // 🔐 EVERYTHING ELSE
-    .anyRequest().authenticated()
-)
+                                .exceptionHandling(ex -> ex
+                                                .authenticationEntryPoint((request, response, authException) -> {
+                                                        System.err.println("401 Unauthorized: "
+                                                                        + authException.getMessage());
+                                                        response.setStatus(401);
+                                                        response.setContentType("application/json");
+                                                        response.getWriter().write("{\"message\": \"Unauthorized: "
+                                                                        + authException.getMessage() + "\"}");
+                                                })
+                                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                                        System.err.println("403 Forbidden: "
+                                                                        + accessDeniedException.getMessage());
+                                                        response.setStatus(403);
+                                                        response.setContentType("application/json");
+                                                        response.getWriter().write("{\"message\": \"Forbidden: "
+                                                                        + accessDeniedException.getMessage() + "\"}");
+                                                }))
 
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+                return http.build();
+        }
 
-    // ✅ THIS WAS MISSING (MOST IMPORTANT PART)
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+        // ✅ THIS WAS MISSING (MOST IMPORTANT PART)
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowedOrigins(List.of("http://localhost:5173"));
+                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedHeaders(List.of("*"));
+                config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", config);
 
-        return source;
-    }
+                return source;
+        }
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
+        @Bean
+        public AuthenticationManager authenticationManager(
+                        AuthenticationConfiguration config) throws Exception {
+                return config.getAuthenticationManager();
+        }
 }

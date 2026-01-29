@@ -16,13 +16,25 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // ✅ PUBLIC - View all products (Paginated)
+    // ✅ PUBLIC - View all products (Paginated + Search + Sort)
     @GetMapping
     public org.springframework.data.domain.Page<Product> getAll(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
-        return productService.getAll(pageable);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "id,desc") String[] sort) {
+
+        String sortField = sort[0];
+        String sortDirection = (sort.length > 1) ? sort[1] : "desc";
+
+        org.springframework.data.domain.Sort sorting = sortDirection.equalsIgnoreCase("asc")
+                ? org.springframework.data.domain.Sort.by(sortField).ascending()
+                : org.springframework.data.domain.Sort.by(sortField).descending();
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size,
+                sorting);
+
+        return productService.getAll(search, pageable);
     }
 
     // ✅ PUBLIC - View product by ID

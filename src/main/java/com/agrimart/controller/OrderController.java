@@ -27,8 +27,8 @@ public class OrderController {
         private final UserRepository userRepository;
         private final InvoiceService invoiceService;
 
-        // 🔐 USER ONLY - Checkout (create order from cart)
-        @PreAuthorize("hasRole('USER')")
+        // 🔐 USER & ADMIN - Checkout (create order from cart)
+        @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
         @PostMapping("/checkout")
         public OrderResponse checkout(
                         Authentication authentication,
@@ -74,8 +74,8 @@ public class OrderController {
                                 .body(pdfBytes);
         }
 
-        // 🔐 USER ONLY - Get own order history (users can only see their own orders)
-        @PreAuthorize("hasRole('USER')")
+        // 🔐 USER & ADMIN - Get own order history (users can only see their own orders)
+        @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
         @GetMapping
         public List<OrderResponse> getMyOrders(Authentication authentication) {
 

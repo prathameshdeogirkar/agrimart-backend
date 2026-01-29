@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Table(name = "products")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,8 +20,6 @@ public class Product {
     private double price;
     private String category;
     private String imageUrl;
-<<<<<<< HEAD
-=======
 
     @Column(length = 1000)
     private String description;
@@ -43,5 +42,4 @@ public class Product {
     @Column(name = "image_url")
     @Builder.Default
     private java.util.List<String> galleryImages = new java.util.ArrayList<>();
->>>>>>> 85dfd60 (pagination done)
 }

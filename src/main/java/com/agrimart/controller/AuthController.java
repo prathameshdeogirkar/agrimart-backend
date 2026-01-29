@@ -27,13 +27,11 @@ public class AuthController {
         User user = authService.register(
                 request.getName(),
                 request.getEmail(),
-                request.getPassword()
-        );
+                request.getPassword());
 
         return ResponseEntity.ok(Map.of(
                 "message", "User registered successfully",
-                "email", user.getEmail()
-        ));
+                "email", user.getEmail()));
     }
 
     // ✅ LOGIN
@@ -42,8 +40,7 @@ public class AuthController {
 
         User user = authService.login(
                 request.getEmail(),
-                request.getPassword()
-        );
+                request.getPassword());
 
         // ✅ FIXED: Pass role to JWT generator
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());

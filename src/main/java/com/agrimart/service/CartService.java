@@ -27,8 +27,7 @@ public class CartService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        Optional<Cart> existingCart =
-                cartRepository.findByUserAndProduct(user, product);
+        Optional<Cart> existingCart = cartRepository.findByUserAndProduct(user, product);
 
         // ✅ If product already in cart → increase quantity
         if (existingCart.isPresent()) {
@@ -47,20 +46,19 @@ public class CartService {
     }
 
     // ✅ VIEW CART (DTO – SAFE RESPONSE)
-public List<CartResponse> viewCart(User user) {
+    public List<CartResponse> viewCart(User user) {
 
-    return cartRepository.findByUser(user)
-            .stream()
-            .map(cart -> new CartResponse(
-                    cart.getId(),
-                    cart.getProduct().getId(),
-                    cart.getProduct().getName(),
-                    cart.getProduct().getPrice(),
-                    cart.getQuantity(),
-                    cart.getProduct().getPrice() * cart.getQuantity()
-            ))
-            .toList();
-}
+        return cartRepository.findByUser(user)
+                .stream()
+                .map(cart -> new CartResponse(
+                        cart.getId(),
+                        cart.getProduct().getId(),
+                        cart.getProduct().getName(),
+                        cart.getProduct().getPrice(),
+                        cart.getQuantity(),
+                        cart.getProduct().getPrice() * cart.getQuantity()))
+                .toList();
+    }
 
     // ✅ REMOVE FROM CART
     public void removeFromCart(User user, Long cartId) {
@@ -80,7 +78,7 @@ public List<CartResponse> viewCart(User user) {
     // - Validation: Quantity must be >= 1
     // - Returns updated CartResponse with new total price
     public CartResponse updateCartQuantity(User user, Long cartId, int quantity) {
-        
+
         // Find cart item
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
@@ -106,8 +104,7 @@ public List<CartResponse> viewCart(User user) {
                 cart.getProduct().getName(),
                 cart.getProduct().getPrice(),
                 cart.getQuantity(),
-                cart.getProduct().getPrice() * cart.getQuantity()
-        );
+                cart.getProduct().getPrice() * cart.getQuantity());
     }
 
     // ✅ CLEAR CART (used after checkout)

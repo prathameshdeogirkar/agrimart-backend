@@ -71,7 +71,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                         new WebAuthenticationDetailsSource().buildDetails(request));
 
                         SecurityContextHolder.getContext().setAuthentication(authToken);
-                        System.out.println("JwtAuthFilter: Authenticated user: " + email);
+                        System.out.println("JwtAuthFilter: Authenticated user: " + email + ", Roles: "
+                                        + authToken.getAuthorities());
                 }
 
                 filterChain.doFilter(request, response);
