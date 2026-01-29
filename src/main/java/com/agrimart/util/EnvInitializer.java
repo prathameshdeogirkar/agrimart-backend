@@ -14,40 +14,35 @@ public class EnvInitializer {
     private static final String ENV_FILE = ".env";
     private static final String EXAMPLE_FILE = ".env.example";
 
-public static void init() {
 
-    // ✅ Detect Production / Railway
-    String railwayEnv = System.getenv("RAILWAY_ENVIRONMENT");
-    String springProfile = System.getenv("SPRING_PROFILES_ACTIVE");
+    public static void init() {
 
-    if (railwayEnv != null || "production".equalsIgnoreCase(springProfile)) {
-        System.out.println("🚀 Production environment detected. Skipping EnvInitializer.");
+    // ☁️ Detect Railway / cloud environment
+    if (System.getenv("RAILWAY_ENVIRONMENT") != null
+            || System.getenv("RAILWAY_PROJECT_ID") != null
+            || System.getenv("PORT") != null) {
+
+        System.out.println("☁️ Cloud environment detected — skipping .env initialization");
         return;
     }
 
-    System.out.println("🚀 Initializing LOCAL Environment Configuration...");
+    System.out.println("🚀 Initializing local environment configuration...");
 
-    Path envPath = Paths.get(ENV_FILE);
-    Path examplePath = Paths.get(EXAMPLE_FILE);
+    Path envPath = Paths.get(".env");
+    Path examplePath = Paths.get(".env.example");
 
-    // 1. Auto-create .env if missing (LOCAL ONLY)
     if (!Files.exists(envPath)) {
-        System.out.println("⚠️  .env file missing. Creating from .env.example...");
-        if (!Files.exists(examplePath)) {
-            throw new RuntimeException(
-                    "CRITICAL ERROR: .env.example missing! Please ensure it exists in the root directory.");
-        }
         try {
-            Files.copy(examplePath, envPath, StandardCopyOption.COPY_ATTRIBUTES);
-            System.out.println("✅ .env file created successfully.");
+            Files.copy(examplePath, envPath);
+            System.out.println("✅ .env file created from .env.example");
         } catch (IOException e) {
-            throw new RuntimeException("CRITICAL ERROR: Failed to copy .env.example to .env", e);
+            throw new RuntimeException("Failed to create .env file", e);
         }
     }
 
-    // 2. Fail-fast validation (LOCAL ONLY)
     validateEnv();
 }
+
 
 
     private static void validateEnv() {
