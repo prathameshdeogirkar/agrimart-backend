@@ -54,6 +54,7 @@ public class CartService {
                         cart.getId(),
                         cart.getProduct().getId(),
                         cart.getProduct().getName(),
+                        cart.getProduct().getImageUrl(),
                         cart.getProduct().getPrice(),
                         cart.getQuantity(),
                         cart.getProduct().getPrice() * cart.getQuantity()))
@@ -102,6 +103,7 @@ public class CartService {
                 cart.getId(),
                 cart.getProduct().getId(),
                 cart.getProduct().getName(),
+                cart.getProduct().getImageUrl(),
                 cart.getProduct().getPrice(),
                 cart.getQuantity(),
                 cart.getProduct().getPrice() * cart.getQuantity());

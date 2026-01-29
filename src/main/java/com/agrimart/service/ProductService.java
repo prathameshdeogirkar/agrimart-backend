@@ -33,6 +33,39 @@ public class ProductService {
         if (productDetails.getImageUrl() != null) {
             product.setImageUrl(productDetails.getImageUrl());
         }
+        if (productDetails.getDescription() != null) {
+            product.setDescription(productDetails.getDescription());
+        }
+        if (productDetails.getMrp() != null) {
+            product.setMrp(productDetails.getMrp());
+        }
+        if (productDetails.getUnitSize() != null) {
+            product.setUnitSize(productDetails.getUnitSize());
+        }
+        if (productDetails.getShelfLife() != null) {
+            product.setShelfLife(productDetails.getShelfLife());
+        }
+        if (productDetails.getHealthBenefits() != null) {
+            product.setHealthBenefits(productDetails.getHealthBenefits());
+        }
+        if (productDetails.getStorageAdvice() != null) {
+            product.setStorageAdvice(productDetails.getStorageAdvice());
+        }
+        if (productDetails.getFarmerName() != null) {
+            product.setFarmerName(productDetails.getFarmerName());
+        }
+        if (productDetails.getMarketedBy() != null) {
+            product.setMarketedBy(productDetails.getMarketedBy());
+        }
+        if (productDetails.getManufacturerDetails() != null) {
+            product.setManufacturerDetails(productDetails.getManufacturerDetails());
+        }
+        if (productDetails.getFssaiLicense() != null) {
+            product.setFssaiLicense(productDetails.getFssaiLicense());
+        }
+        if (productDetails.getGalleryImages() != null) {
+            product.setGalleryImages(productDetails.getGalleryImages());
+        }
 
         return productRepository.save(product);
     }
