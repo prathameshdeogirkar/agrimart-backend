@@ -14,36 +14,29 @@ public class EnvInitializer {
     private static final String ENV_FILE = ".env";
     private static final String EXAMPLE_FILE = ".env.example";
 
-
     public static void init() {
-
-    // ☁️ Detect Railway / cloud environment
-    if (System.getenv("RAILWAY_ENVIRONMENT") != null
-            || System.getenv("RAILWAY_PROJECT_ID") != null
-            || System.getenv("PORT") != null) {
-
-        System.out.println("☁️ Cloud environment detected — skipping .env initialization");
-        return;
-    }
-
-    System.out.println("🚀 Initializing local environment configuration...");
-
-    Path envPath = Paths.get(".env");
-    Path examplePath = Paths.get(".env.example");
-
-    if (!Files.exists(envPath)) {
-        try {
-            Files.copy(examplePath, envPath);
-            System.out.println("✅ .env file created from .env.example");
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create .env file", e);
+        // 🚆 Detect Railway environment
+        if (System.getenv("RAILWAY_ENVIRONMENT") != null) {
+            System.out.println("🚆 Railway environment detected. Skipping .env initialization.");
+            return;
         }
+
+        System.out.println("🚀 Initializing local environment configuration...");
+
+        Path envPath = Paths.get(".env");
+        Path examplePath = Paths.get(".env.example");
+
+        if (!Files.exists(envPath)) {
+            try {
+                Files.copy(examplePath, envPath);
+                System.out.println("✅ .env file created from .env.example");
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to create .env file", e);
+            }
+        }
+
+        validateEnv();
     }
-
-    validateEnv();
-}
-
-
 
     private static void validateEnv() {
         try {
