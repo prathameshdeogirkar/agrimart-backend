@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class AgrimartBackendApplication {
 
     public static void main(String[] args) {
+        com.agrimart.util.EnvInitializer.init();
         SpringApplication.run(AgrimartBackendApplication.class, args);
         System.out.println("Agrimart Backend Application is running...");
     }
