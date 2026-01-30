@@ -22,6 +22,7 @@ import java.util.List;
 public class SecurityConfig {
 
         private final JwtAuthFilter jwtAuthFilter;
+        private final com.agrimart.security.oauth2.OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -53,6 +54,9 @@ public class SecurityConfig {
 
                                                 // 🔐 EVERYTHING ELSE
                                                 .anyRequest().authenticated())
+
+                                .oauth2Login(oauth2 -> oauth2
+                                                .successHandler(oAuth2LoginSuccessHandler))
 
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint((request, response, authException) -> {
