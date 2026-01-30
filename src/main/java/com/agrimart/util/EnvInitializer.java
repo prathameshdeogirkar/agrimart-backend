@@ -56,8 +56,9 @@ public class EnvInitializer {
             checkPlaceholder(envVars, "DB_PASSWORD", "your_password_here");
             checkPlaceholder(envVars, "RAZORPAY_KEY_ID", "your_razorpay_key_id");
             checkPlaceholder(envVars, "RAZORPAY_KEY_SECRET", "your_razorpay_key_secret");
-            checkPlaceholder(envVars, "MAIL_USERNAME", "your_email@gmail.com");
-            checkPlaceholder(envVars, "MAIL_PASSWORD", "your_app_password");
+            checkPlaceholder(envVars, "BREVO_API_KEY", "your_brevo_api_key_here");
+            checkPlaceholder(envVars, "BREVO_SENDER_EMAIL", "your_verified_sender@email.com");
+            checkPlaceholder(envVars, "BREVO_SENDER_NAME", "Agrimart");
 
             System.out.println("✅ Environment configuration validated.");
 
