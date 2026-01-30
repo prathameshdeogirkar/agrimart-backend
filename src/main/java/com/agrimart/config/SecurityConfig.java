@@ -34,16 +34,20 @@ public class SecurityConfig {
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth
 
-                                                // ✅ PUBLIC
+                                                // ✅ PUBLIC (Browse products & categories without login)
                                                 .requestMatchers("/auth/**").permitAll()
+                                                .requestMatchers("/api/auth/**").permitAll()
                                                 .requestMatchers("/api/products/**").permitAll()
+                                                .requestMatchers("/api/categories/**").permitAll()
 
-                                                // 🔐 SECURED (Roles handled by @PreAuthorize in Controllers)
+                                                // 🔐 SECURED (Requires JWT)
                                                 .requestMatchers(
                                                                 "/api/cart/**",
                                                                 "/api/orders/**",
                                                                 "/api/checkout/**",
-                                                                "/api/admin/**")
+                                                                "/api/admin/**",
+                                                                "/api/test/**",
+                                                                "/api/users/**")
                                                 .authenticated()
 
                                                 // 🔐 EVERYTHING ELSE
