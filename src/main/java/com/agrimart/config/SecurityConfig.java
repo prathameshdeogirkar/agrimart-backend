@@ -23,7 +23,6 @@ public class SecurityConfig {
 
         private final JwtAuthFilter jwtAuthFilter;
         private final com.agrimart.security.oauth2.OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-        private final com.agrimart.security.oauth2.OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,8 +37,7 @@ public class SecurityConfig {
 
                                                 // ✅ PUBLIC (Browse products & categories without login)
                                                 .requestMatchers("/", "/error").permitAll()
-                                                .requestMatchers("/auth/**", "/oauth2/**", "/login/oauth2/**")
-                                                .permitAll() // ✅ Explicitly allow OAuth flow
+                                                .requestMatchers("/auth/**").permitAll()
                                                 .requestMatchers("/api/auth/**").permitAll()
                                                 .requestMatchers("/api/products/**").permitAll()
                                                 .requestMatchers("/api/categories/**").permitAll()
@@ -58,8 +56,7 @@ public class SecurityConfig {
                                                 .anyRequest().authenticated())
 
                                 .oauth2Login(oauth2 -> oauth2
-                                                .successHandler(oAuth2LoginSuccessHandler)
-                                                .failureHandler(oAuth2LoginFailureHandler))
+                                                .successHandler(oAuth2LoginSuccessHandler))
 
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint((request, response, authException) -> {
