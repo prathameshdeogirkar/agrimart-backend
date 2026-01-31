@@ -37,7 +37,8 @@ public class SecurityConfig {
 
                                                 // ✅ PUBLIC (Browse products & categories without login)
                                                 .requestMatchers("/", "/error").permitAll()
-                                                .requestMatchers("/auth/**").permitAll()
+                                                .requestMatchers("/auth/**", "/oauth2/**", "/login/oauth2/**")
+                                                .permitAll() // ✅ Explicitly allow OAuth flow
                                                 .requestMatchers("/api/auth/**").permitAll()
                                                 .requestMatchers("/api/products/**").permitAll()
                                                 .requestMatchers("/api/categories/**").permitAll()
