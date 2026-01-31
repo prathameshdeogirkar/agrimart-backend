@@ -68,6 +68,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         // Frontend should handle /oauth/callback?token=... and save it
         String targetUrl = redirectUri + "/oauth/callback?token=" + token;
 
+        System.out.println("🚀 OAuth2 Switch: Redirecting to " + targetUrl);
+
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }
