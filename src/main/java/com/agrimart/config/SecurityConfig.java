@@ -36,7 +36,8 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> auth
 
                                                 // ✅ PUBLIC (Browse products & categories without login)
-                                                .requestMatchers("/", "/error").permitAll()
+                                                .requestMatchers("/", "/error", "/login", "/login/**", "/oauth2/**")
+                                                .permitAll()
                                                 .requestMatchers("/auth/**").permitAll()
                                                 .requestMatchers("/api/auth/**").permitAll()
                                                 .requestMatchers("/api/products/**").permitAll()
