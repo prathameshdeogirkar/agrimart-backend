@@ -22,6 +22,7 @@ import java.util.List;
 public class SecurityConfig {
 
         private final JwtAuthFilter jwtAuthFilter;
+        private final com.agrimart.security.oauth2.OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
         private final com.agrimart.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
         @Bean
