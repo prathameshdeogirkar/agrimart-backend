@@ -22,7 +22,7 @@ import java.util.List;
 public class SecurityConfig {
 
         private final JwtAuthFilter jwtAuthFilter;
-        private final com.agrimart.security.oauth2.OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+        private final com.agrimart.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -41,6 +41,8 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/auth/**").permitAll()
                                                 .requestMatchers("/api/products/**").permitAll()
                                                 .requestMatchers("/api/categories/**").permitAll()
+                                                .requestMatchers("/login/oauth2/code/**").permitAll() // ✅ Allow OAuth
+                                                                                                      // Callback
 
                                                 // 🔐 SECURED (Requires JWT)
                                                 .requestMatchers(
@@ -56,6 +58,12 @@ public class SecurityConfig {
                                                 .anyRequest().authenticated())
 
                                 .oauth2Login(oauth2 -> oauth2
+                                                .authorizationEndpoint(auth -> auth
+                                                                .baseUri("/oauth2/authorization")
+                                                                .authorizationRequestRepository(
+                                                                                httpCookieOAuth2AuthorizationRequestRepository))
+                                                .redirectionEndpoint(redirection -> redirection
+                                                                .baseUri("/login/oauth2/code/*"))
                                                 .successHandler(oAuth2LoginSuccessHandler))
 
                                 .exceptionHandling(ex -> ex
