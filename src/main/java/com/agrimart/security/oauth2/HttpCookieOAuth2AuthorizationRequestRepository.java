@@ -16,17 +16,9 @@ public class HttpCookieOAuth2AuthorizationRequestRepository
 
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
-        System.out.println("🔍 Loading Authorization Request Cookie...");
-        OAuth2AuthorizationRequest req = CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
-                .map(cookie -> {
-                    System.out.println("✅ Found Cookie! Validating...");
-                    return CookieUtils.deserialize(cookie, OAuth2AuthorizationRequest.class);
-                })
+        return CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
+                .map(cookie -> CookieUtils.deserialize(cookie, OAuth2AuthorizationRequest.class))
                 .orElse(null);
-
-        if (req == null)
-            System.err.println("❌ Authorization Request Cookie NOT FOUND");
-        return req;
     }
 
     @Override
