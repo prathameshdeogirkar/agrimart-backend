@@ -3,7 +3,6 @@ package com.agrimart.util;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.util.SerializationUtils;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -47,12 +46,25 @@ public class CookieUtils {
     }
 
     public static String serialize(Object object) {
-        return Base64.getUrlEncoder()
-                .encodeToString(SerializationUtils.serialize(object));
+        try {
+            java.io.ByteArrayOutputStream bo = new java.io.ByteArrayOutputStream();
+            java.io.ObjectOutputStream so = new java.io.ObjectOutputStream(bo);
+            so.writeObject(object);
+            so.flush();
+            return Base64.getUrlEncoder().encodeToString(bo.toByteArray());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize object", e);
+        }
     }
 
     public static <T> T deserialize(Cookie cookie, Class<T> cls) {
-        return cls.cast(SerializationUtils.deserialize(
-                Base64.getUrlDecoder().decode(cookie.getValue())));
+        try {
+            byte[] bytes = Base64.getUrlDecoder().decode(cookie.getValue());
+            java.io.ByteArrayInputStream bi = new java.io.ByteArrayInputStream(bytes);
+            java.io.ObjectInputStream si = new java.io.ObjectInputStream(bi);
+            return cls.cast(si.readObject());
+        } catch (Exception e) {
+            return null; // Cookie verification failed
+        }
     }
 }
