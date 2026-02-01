@@ -65,7 +65,15 @@ public class SecurityConfig {
                                                                                 httpCookieOAuth2AuthorizationRequestRepository))
                                                 .redirectionEndpoint(redirection -> redirection
                                                                 .baseUri("/login/oauth2/code/*"))
-                                                .successHandler(oAuth2LoginSuccessHandler))
+                                                .successHandler(oAuth2LoginSuccessHandler)
+                                                .failureHandler((request, response, exception) -> {
+                                                        System.err.println("❌ OAuth2 Login Failed: "
+                                                                        + exception.getMessage());
+                                                        exception.printStackTrace();
+                                                        response.setStatus(401);
+                                                        response.getWriter().write("{\"message\": \"OAuth2 Failed: "
+                                                                        + exception.getMessage() + "\"}");
+                                                }))
 
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint((request, response, authException) -> {
