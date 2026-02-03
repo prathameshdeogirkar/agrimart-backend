@@ -42,6 +42,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/auth/**").permitAll()
                                                 .requestMatchers("/api/products/**").permitAll()
                                                 .requestMatchers("/api/categories/**").permitAll()
+                                                .requestMatchers("/api/chat").permitAll() // ✅ Allow AI Chatbot
                                                 .requestMatchers("/login/oauth2/code/**").permitAll() // ✅ Allow OAuth
                                                                                                       // Callback
 
