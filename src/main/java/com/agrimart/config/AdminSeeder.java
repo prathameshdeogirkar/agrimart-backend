@@ -1,4 +1,4 @@
-package com.agrimart.config;
+    package com.agrimart.config;
 
 import com.agrimart.entity.Role;
 import com.agrimart.entity.User;
